@@ -26,6 +26,7 @@ Before using the package, you need to configure it with your API credentials. Yo
 Here's how you to initiate our SDK in your project:
 
 ```python
+import asyncio
 from flick import Config
 from bills import Bills
 
@@ -44,20 +45,23 @@ The Bills client provides access to various functionalities for managing bills. 
 
 ```python
 egs_data = { /* Your EGS data - Check Documentation */ }
-response = api.onboard_egs(egsData)
+loop = asyncio.get_event_loop()
+result = loop.run_until_complete(api.onboard_egs(egs_data=egs_data))
 ```
 
 #### Compliance Check:
 
 ```python
 egs_uuid = 'your-egs-uuid';
-response = api.do_compliance_check(egs_uuid);
+loop = asyncio.get_event_loop()
+result = loop.run_until_complete(api.do_compliance_check(egs_uuid))
 ```
 
 #### Generate E-Invoice for Phase-2 in Saudi Arabia:
 ```python
-invoiceData = { /* Your invoice data - Check Documentation */ };
-response = api.generate_invoice(invoiceData);
+invoiceData = { /* Your invoice data - Check Documentation */ }
+loop = asyncio.get_event_loop()
+result = loop.run_until_complete(api.generate_invoice(invoiceData))
 ```
 
 ## Examples
@@ -65,6 +69,7 @@ response = api.generate_invoice(invoiceData);
 1. Here's an Example of how you can **onboard multiple EGS to ZATCA Portal** [If you are onboarding PoS devices or VAT-Group members, this comes handy].
 
 ```python
+import asyncio
 from flick.api_service import Config 
 from flick.bills import Bills,EGSData,Devices
 
@@ -104,14 +109,18 @@ egs_data = EGSData(
     ]
 )
 
-response = client.onboard_egs(egs_data=egs_data)
-print(response.text)
 
+loop = asyncio.get_event_loop()
+result = loop.run_until_complete(client.onboard_egs(egs_data=egs_data))
+# Process the result the way you want
+print(result)
+ 
 ```
 
 2. Here's an Example of how you can **Genereate a ZATCA-Complied E-Invoice**.
 
 ```python
+import asyncio
 from flick.api_service import Config
 from flick.bills import Bills, InvoiceData, PartyAddId, PartyDetails, AdvanceDetails, AdvanceInvoices, Invoice, LineItems
 
@@ -179,9 +188,10 @@ invoice_data = InvoiceData(
     ],
 )
 
-response = client.generate_invoice(invoice_data=invoice_data)
-print(response.text)
-
+loop = asyncio.get_event_loop()
+result = loop.run_until_complete(client.generate_invoice(invoice_data=invoice_data))
+# Process the result the way you want
+print(result)
 
 ```
 
