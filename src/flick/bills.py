@@ -88,24 +88,25 @@ class PartyDetails:
         self.plot_identification = plot_identification
         self.building = building
         self.postal_zone = postal_zone
+
     def to_json(self):
 
         out = {
-            "party_name_ar" : self.party_name_ar,
-            "party_vat" : self.party_vat,
-            "city_ar" : self.city_ar,
-            "city_subdivision_ar" : self.city_subdivision_ar,
-            "street_ar" : self.street_ar,
-            "postal_zone" : self.postal_zone,
-            "party_add_id" : self.party_add_id,
-            "city_en" : self.city_en,
-            "city_subdivision_en" : self.city_subdivision_en,
-            "street_en" : self.street_en,
-            "plot_identification" : self.plot_identification,
-            "building" : self.building,
-            "party_name_en" : self.party_name_en,
+            "party_name_ar": self.party_name_ar,
+            "party_vat": self.party_vat,
+            "city_ar": self.city_ar,
+            "city_subdivision_ar": self.city_subdivision_ar,
+            "street_ar": self.street_ar,
+            "postal_zone": self.postal_zone,
+            "party_add_id": self.party_add_id,
+            "city_en": self.city_en,
+            "city_subdivision_en": self.city_subdivision_en,
+            "street_en": self.street_en,
+            "plot_identification": self.plot_identification,
+            "building": self.building,
+            "party_name_en": self.party_name_en,
         }
-        
+
         out["party_add_id"] = self.party_add_id.__dict__
 
         return out
@@ -185,8 +186,8 @@ class AdvanceDetails:
     def to_json(self):
 
         out = {
-            "advance_amount":self.advance_amount,
-            "total_amount":self.total_amount,
+            "advance_amount": self.advance_amount,
+            "total_amount": self.total_amount,
         }
         advance_invoices = []
         for advance_invoice in self.advance_invoices:
@@ -199,7 +200,7 @@ class AdvanceDetails:
 class InvoiceData:
     """ The EGSData class. """
 
-    def __init__(self, 
+    def __init__(self,
                  egs_uuid: str,
                  invoice_ref_number: str,
                  issue_date: str,
@@ -230,16 +231,16 @@ class InvoiceData:
     def to_json(self):
 
         out = {
-            "egs_uuid" : self.egs_uuid,
-            "invoice_ref_number" : self.invoice_ref_number,
-            "issue_date" : self.issue_date,
-            "issue_time" : self.issue_time,
-            "doc_type" : self.doc_type,
-            "inv_type" : self.inv_type,
-            "payment_method" : self.payment_method,
-            "has_advance" : self.has_advance,
-            "currency" : self.currency,
-            "total_tax" : self.total_tax,
+            "egs_uuid": self.egs_uuid,
+            "invoice_ref_number": self.invoice_ref_number,
+            "issue_date": self.issue_date,
+            "issue_time": self.issue_time,
+            "doc_type": self.doc_type,
+            "inv_type": self.inv_type,
+            "payment_method": self.payment_method,
+            "has_advance": self.has_advance,
+            "currency": self.currency,
+            "total_tax": self.total_tax,
         }
         out["party_details"] = self.party_details.to_json()
         lineitems = []
@@ -249,6 +250,11 @@ class InvoiceData:
         out["advance_details"] = self.advance_details.to_json()
 
         return out
+
+
+class NetworkException(Exception):
+    """ Class for raising network related errors """
+    pass
 
 
 class Bills:
@@ -280,9 +286,10 @@ class Bills:
         Args:
             config (Config): A configuration object for the Flick API.
         """
-        self.api = FlickAPI(config=config)
+        self.config = config
 
-    def onboard_egs(self, egs_data: EGSData):
+   
+    async def onboard_egs(self, egs_data: EGSData):
         """
         Onboard an EGS  with the provided data.
 
@@ -295,15 +302,22 @@ class Bills:
         Raises:
             Exception: If an error occurs during the onboarding process.
         """
+
         try:
-            response = self.api.post(
-                '/egs/onboard', json.dumps(egs_data.to_json()))
-            return response
+            async with FlickAPI(config=self.config) as session:
+                async with session.request('POST', '/egs/onboard', data=json.dumps(egs_data.to_json())) as response:
+                    if response.status == 200:
+                        response_text = await response.text()
+                        # Process the response data here
+                        return response_text
+                    else:
+                        raise NetworkException(
+                            f"Request failed with status code: {response.status}")
         except Exception as error:
             # Handle errors here
             raise error
 
-    def do_compliance_check(self, egs_uuid: str):
+    async def do_compliance_check(self, egs_uuid: str):
         """
         Perform a compliance check for an EGS with the specified UUID.
 
@@ -316,14 +330,22 @@ class Bills:
         Raises:
             Exception: If an error occurs during the compliance check.
         """
+
         try:
-            response = self.api.get(f"/egs/compliance-check/{egs_uuid}")
-            return response
+            async with FlickAPI(config=self.config) as session:
+                async with session.request('GET', f"/egs/compliance-check/{egs_uuid}") as response:
+                    if response.status == 200:
+                        response_text = await response.text()
+                        # Process the response data here
+                        return response_text
+                    else:
+                        raise NetworkException(
+                            f"Request failed with status code: {response.status}")
         except Exception as error:
             # Handle errors here
             raise error
 
-    def generate_invoice(self, invoice_data: InvoiceData):
+    async def generate_invoice(self, invoice_data: InvoiceData):
         """
         Generate an invoice based on the provided invoice data.
 
@@ -337,9 +359,15 @@ class Bills:
             Exception: If an error occurs during the invoice generation process.
         """
         try:
-            print(json.dumps(invoice_data.to_json()))
-            response = self.api.post('/invoice/generate', invoice_data.to_json())
-            return response
+            async with FlickAPI(config=self.config) as session:
+                async with session.request('POST', '/invoice/generate', data=json.dumps(invoice_data.to_json())) as response:
+                    if response.status == 200:
+                        response_text = await response.text()
+                        # Process the response data here
+                        return response_text
+                    else:
+                        raise NetworkException(
+                            f"Request failed with status code: {response.status}")
         except Exception as error:
             # Handle errors here
             raise error

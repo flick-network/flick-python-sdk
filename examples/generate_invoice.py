@@ -1,3 +1,4 @@
+import asyncio
 from flick.api_service import Config
 from flick.bills import Bills, InvoiceData, PartyAddId, PartyDetails, AdvanceDetails, AdvanceInvoices, Invoice, LineItems
 
@@ -65,5 +66,7 @@ invoice_data = InvoiceData(
     ],
 )
 
-response = client.generate_invoice(invoice_data=invoice_data)
-print(response.text)
+loop = asyncio.get_event_loop()
+result = loop.run_until_complete(client.generate_invoice(invoice_data=invoice_data))
+# Process the result the way you want
+print(result)

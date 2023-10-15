@@ -1,3 +1,4 @@
+import asyncio
 from flick.api_service import Config 
 from flick.bills import Bills,EGSData,Devices
 
@@ -37,5 +38,9 @@ egs_data = EGSData(
     ]
 )
 
-response = client.onboard_egs(egs_data=egs_data)
-print(response.text)
+
+loop = asyncio.get_event_loop()
+result = loop.run_until_complete(client.onboard_egs(egs_data=egs_data))
+# Process the result the way you want
+print(result)
+ 

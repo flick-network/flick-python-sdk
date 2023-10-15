@@ -1,6 +1,6 @@
 """ Module for initializing request class """
 import urllib
-import requests
+import aiohttp
 
 
 class InvalidEnvironmentException(Exception):
@@ -23,9 +23,17 @@ class Config():
                 "Invalid environment type. use 'sandbox' or 'production'")
 
 
-class FlickAPI(requests.Session):
-    """Base class for making all requsts to flick.network"""
+class FlickAPI(aiohttp.ClientSession):
+    """
+    A custom aiohttp client session for making authenticated requests to a specified base URL.
 
+    Args:
+        config (Config): The configuration object containing API key and other settings.
+
+    Attributes:
+        custom_config (Config): The custom configuration object.
+        base_url (str): The base URL for requests.
+    """
     SANDBOX_BASE_URL = "https://sandbox-api.flick.network"
     PRODUCTION_BASE_URL = "https://api.flick.network"
 
@@ -38,65 +46,32 @@ class FlickAPI(requests.Session):
         return self.SANDBOX_BASE_URL
 
 
+   
 
-    def __init__(self, *args, config: Config, **kwargs):
+    def __init__(self, config: Config):
         """
-        Customised requests.Session class for common base url
+        Initialize the CustomSession with a custom configuration.
 
         Args:
-            url_base (string, optional): base url for all web requests . Defaults to None.
+            config (Config): The configuration object containing API key and other settings.
         """
-
         self.custom_config = config
-        super(FlickAPI, self).__init__(*args, **kwargs)
-        self.url_base = self.get_base_url()
+        super().__init__(headers={'Authorization': f'Bearer {config.api_key}'})
+        self.base_url = self.get_base_url()
 
-
-
-    def request(self, method, url,
-                params=None,
-                data=None,
-                headers=None,
-                cookies=None,
-                files=None,
-                auth=None,
-                timeout=None,
-                allow_redirects=True,
-                proxies=None,
-                hooks=None,
-                stream=None,
-                verify=None,
-                cert=None,
-                json=None,):
-        """concatenate and create all relavent urls
+    def request(self, method, url, **kwargs):
+        """
+        Make a request using the specified method, URL, and additional keyword arguments.
 
         Args:
-            method (str): HTTP Method
-            url (str): Remaining part of URL
+            method (str): The HTTP method for the request (e.g., 'GET', 'POST').
+            url (str): The path of the URL to request, relative to the base URL.
+            **kwargs: Additional keyword arguments for the request.
 
         Returns:
-            requests: requests object to use 
+            aiohttp.ClientResponse: The response from the request.
         """
-        modified_url = urllib.parse.urljoin(base=self.url_base, url=url)
-
-        if headers is not None:
-            headers["Authorization"] =  f"Bearer {self.custom_config.api_key}",
-        else:
-            headers = {
-                "Authorization": f"Bearer {self.custom_config.api_key}",
-            }
-
-        return super(FlickAPI, self).request(method, modified_url, params,
-                                                   data,
-                                                   headers,
-                                                   cookies,
-                                                   files,
-                                                   auth,
-                                                   timeout,
-                                                   allow_redirects,
-                                                   proxies,
-                                                   hooks,
-                                                   stream,
-                                                   verify,
-                                                   cert,
-                                                   json)
+        # Prepend the base_url to the request URL
+        full_url = urllib.parse.urljoin(base=self.base_url, url=url)
+        return super().request(method, full_url, **kwargs)
+    
