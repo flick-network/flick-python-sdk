@@ -4,7 +4,7 @@ with open("README.md", "r", encoding = "utf-8") as fh:
 
 setup(
     name = "flick-python-sdk",
-    version = "0.0.14",
+    version = "1.0.0",
     author = "Sivadas Rajan",
     author_email = "sivadasrajan@gmail.com",
     description = "A Python wrapper for interacting with APIs from Flick.",
@@ -12,6 +12,8 @@ setup(
     long_description_content_type = "text/markdown",
     install_requires=["aiohttp>=3.5.0"],
     url = "https://pypi.org/project/flick-python-sdk/",
+    maintainer="Sivadas Rajan",
+    maintainer_email="sivadasrajan@gmail.com",
     project_urls = {
         "Bug Tracker": "https://github.com/flick-network/flick-python-sdk/issues",
     },

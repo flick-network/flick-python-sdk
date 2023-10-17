@@ -3,7 +3,7 @@ from typing import List
 from .api_service import FlickAPI, Config
 
 
-class Devices():
+class Device():
     """ The Devices class. """
 
     def __init__(self, device_name: str, city: str, city_subdiv: str, street: str, plot: str, building: str, postal: str, branch_name: str, branch_industry: str, otp: str):
@@ -23,7 +23,7 @@ class Devices():
 class EGSData:
     """ The EGSData class. """
 
-    def __init__(self, vat_name: str, vat_number: str, devices: List[Devices]):
+    def __init__(self, vat_name: str, vat_number: str, devices: List[Device]):
         """
         Initializes an instance of EGSData.
 
@@ -36,7 +36,8 @@ class EGSData:
         self.vat_number = vat_number
         self.devices = devices
 
-    def to_json(self):
+    def to_dict(self):
+        """ function to convert class to dictionary  """
 
         out = {
             "vat_name": self.vat_name,
@@ -89,7 +90,8 @@ class PartyDetails:
         self.building = building
         self.postal_zone = postal_zone
 
-    def to_json(self):
+    def to_dict(self):
+        """ function to convert class to dictionary  """
 
         out = {
             "party_name_ar": self.party_name_ar,
@@ -121,7 +123,7 @@ class Invoice:
         self.issue_time = issue_time
 
 
-class LineItems:
+class LineItem:
     """ The LineItems class. """
 
     def __init__(self,
@@ -140,7 +142,7 @@ class LineItems:
         self.tax_percentage = tax_percentage
 
 
-class AdvanceInvoices:
+class AdvanceInvoice:
     """ The AdvanceInvoices class. """
 
     def __init__(self,
@@ -155,7 +157,8 @@ class AdvanceInvoices:
         self.tax_amount = tax_amount
         self.invoices = invoices
 
-    def to_json(self):
+    def to_dict(self):
+        """ function to convert class to dictionary  """
 
         out = {
             "tax_category": self.tax_category,
@@ -177,13 +180,14 @@ class AdvanceDetails:
     def __init__(self,
                  advance_amount: float,
                  total_amount: float,
-                 advance_invoices: AdvanceInvoices
+                 advance_invoices: AdvanceInvoice
                  ):
         self.advance_amount = advance_amount
         self.total_amount = total_amount
         self.advance_invoices = advance_invoices
 
-    def to_json(self):
+    def to_dict(self):
+        """ function to convert class to dictionary  """
 
         out = {
             "advance_amount": self.advance_amount,
@@ -191,7 +195,7 @@ class AdvanceDetails:
         }
         advance_invoices = []
         for advance_invoice in self.advance_invoices:
-            advance_invoices.append(advance_invoice.to_json())
+            advance_invoices.append(advance_invoice.to_dict())
         out["advance_invoices"] = advance_invoices
 
         return out
@@ -208,7 +212,7 @@ class InvoiceData:
                  doc_type: str,
                  inv_type: str,
                  payment_method: int,
-                 lineitems: LineItems,
+                 lineitems: LineItem,
                  party_details: PartyDetails,
                  advance_details: AdvanceDetails = None,
                  has_advance: bool = None,
@@ -228,7 +232,8 @@ class InvoiceData:
         self.total_tax = total_tax
         self.lineitems = lineitems
 
-    def to_json(self):
+    def to_dict(self):
+        """ function to convert class to dictionary  """
 
         out = {
             "egs_uuid": self.egs_uuid,
@@ -242,12 +247,12 @@ class InvoiceData:
             "currency": self.currency,
             "total_tax": self.total_tax,
         }
-        out["party_details"] = self.party_details.to_json()
+        out["party_details"] = self.party_details.to_dict()
         lineitems = []
         for lineitem in self.lineitems:
             lineitems.append(lineitem.__dict__)
         out["lineitems"] = lineitems
-        out["advance_details"] = self.advance_details.to_json()
+        out["advance_details"] = self.advance_details.to_dict()
 
         return out
 
@@ -305,7 +310,7 @@ class Bills:
 
         try:
             async with FlickAPI(config=self.config) as session:
-                async with session.request('POST', '/egs/onboard', data=json.dumps(egs_data.to_json())) as response:
+                async with session.request('POST', '/egs/onboard', data=json.dumps(egs_data.to_dict())) as response:
                     if response.status == 200:
                         response_text = await response.text()
                         # Process the response data here
@@ -360,7 +365,7 @@ class Bills:
         """
         try:
             async with FlickAPI(config=self.config) as session:
-                async with session.request('POST', '/invoice/generate', data=json.dumps(invoice_data.to_json())) as response:
+                async with session.request('POST', '/invoice/generate', data=json.dumps(invoice_data.to_dict())) as response:
                     if response.status == 200:
                         response_text = await response.text()
                         # Process the response data here

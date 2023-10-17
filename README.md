@@ -68,10 +68,12 @@ result = loop.run_until_complete(api.generate_invoice(invoiceData))
 
 1. Here's an Example of how you can **onboard multiple EGS to ZATCA Portal** [If you are onboarding PoS devices or VAT-Group members, this comes handy].
 
+2. Examples are included in the examples folder as well
+
 ```python
 import asyncio
 from flick.api_service import Config 
-from flick.bills import Bills,EGSData,Devices
+from flick.bills import Bills,EGSData,Device
 
 config = Config('sandbox', 'your-api-key')
 
@@ -81,7 +83,7 @@ egs_data = EGSData(
     vat_name='Test Co.',
     vat_number='300000000000003',
     devices=[
-        Devices(
+        Device(
             device_name='TestEGS1',
             city='Riyadh',
             city_subdiv='Test Dist.',
@@ -93,7 +95,7 @@ egs_data = EGSData(
             branch_name='Riyad Branc   h 1',
             branch_industry='Retail',
             otp='123321',
-        ), Devices(
+        ), Device(
             device_name='TestEGS2',
             city='Riyadh',
             city_subdiv='Test Dist.',
@@ -122,7 +124,7 @@ print(result)
 ```python
 import asyncio
 from flick.api_service import Config
-from flick.bills import Bills, InvoiceData, PartyAddId, PartyDetails, AdvanceDetails, AdvanceInvoices, Invoice, LineItems
+from flick.bills import Bills, InvoiceData, PartyAddId, PartyDetails, AdvanceDetails, AdvanceInvoice, Invoice, LineItem
 
 config = Config('sandbox', 'your-api-key')
 
@@ -155,7 +157,7 @@ invoice_data = InvoiceData(
         advance_amount=575,
         total_amount=2875,
         advance_invoices=[
-            AdvanceInvoices(
+            AdvanceInvoice(
                 tax_category='S',
                 tax_percentage=0.15,
                 taxable_amount=500,
@@ -171,14 +173,14 @@ invoice_data = InvoiceData(
         ],
     ),
     lineitems=[
-        LineItems(
+        LineItem(
             name_ar='متحرك',
             quantity=1,
             tax_category='S',
             tax_exclusive_price=750,
             tax_percentage=0.15,
         ),
-        LineItems(
+        LineItem(
             name_ar='حاسوب محمول',
             quantity=1,
             tax_category='S',

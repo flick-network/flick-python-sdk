@@ -1,6 +1,6 @@
 import asyncio
 from flick.api_service import Config
-from flick.bills import Bills, InvoiceData, PartyAddId, PartyDetails, AdvanceDetails, AdvanceInvoices, Invoice, LineItems
+from flick.bills import Bills, InvoiceData, PartyAddId, PartyDetails, AdvanceDetails, AdvanceInvoice, Invoice, LineItem
 
 config = Config('sandbox', 'your-api-key')
 
@@ -33,7 +33,7 @@ invoice_data = InvoiceData(
         advance_amount=575,
         total_amount=2875,
         advance_invoices=[
-            AdvanceInvoices(
+            AdvanceInvoice(
                 tax_category='S',
                 tax_percentage=0.15,
                 taxable_amount=500,
@@ -49,14 +49,14 @@ invoice_data = InvoiceData(
         ],
     ),
     lineitems=[
-        LineItems(
+        LineItem(
             name_ar='متحرك',
             quantity=1,
             tax_category='S',
             tax_exclusive_price=750,
             tax_percentage=0.15,
         ),
-        LineItems(
+        LineItem(
             name_ar='حاسوب محمول',
             quantity=1,
             tax_category='S',

@@ -1,6 +1,6 @@
 import asyncio
 from flick.api_service import Config 
-from flick.bills import Bills,EGSData,Devices
+from flick.bills import Bills,EGSData,Device
 
 config = Config('sandbox', 'your-api-key')
 
@@ -10,7 +10,7 @@ egs_data = EGSData(
     vat_name='Test Co.',
     vat_number='300000000000003',
     devices=[
-        Devices(
+        Device(
             device_name='TestEGS1',
             city='Riyadh',
             city_subdiv='Test Dist.',
@@ -22,7 +22,7 @@ egs_data = EGSData(
             branch_name='Riyad Branc   h 1',
             branch_industry='Retail',
             otp='123321',
-        ), Devices(
+        ), Device(
             device_name='TestEGS2',
             city='Riyadh',
             city_subdiv='Test Dist.',
