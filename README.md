@@ -208,3 +208,7 @@ This project is licensed under the MIT License - see the LICENSE file for detail
 ## Support
 
 If you encounter any issues or have questions, please contact our support team at support@flick.network
+
+## Keywords 
+
+einvoicing, e-invoicing, zatca, phase2, saudi, ksa, fatoora, saudiarabia, egs
